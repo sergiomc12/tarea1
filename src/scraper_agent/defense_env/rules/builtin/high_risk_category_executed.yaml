@@ -1,0 +1,21 @@
+# Regla de visibilidad/auditoria (threshold_count=1 -> una alerta por cada
+# ejecucion que matchea, sin agrupar). No es "malo" que esto se ejecute --
+# son categorias autorizadas del propio catalogo -- pero queda marcado para
+# revision humana en vez de perderse en el log crudo.
+id: correlation.high_risk_category_executed
+title: "Ejecucion de categoria de alto impacto"
+severity: medium
+logsource: tool_audit
+filter:
+  allowed: true
+  category:
+    - bounded_fuzzing
+    - active_scanning
+    - known_vuln_scanning
+    - ics_scada_recon
+threshold_count: 1
+description: >
+  Ejecucion exitosa en una categoria de alto impacto (fuzzing, scanning
+  activo, vuln scanning, ICS/SCADA). Visibilidad para el caso de que se
+  agregue gestion de casos (Fase 4): cada una de estas queda como candidata
+  a revisar, no solo como una linea mas de tool_audit.jsonl.

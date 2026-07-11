@@ -1,0 +1,74 @@
+authorized_targets:
+  - target: "allowed.example.com"
+    type: domain
+    scope: "*.allowed.example.com"
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - passive_recon
+      - light_active_scan
+
+  - target: "full.example.com"
+    type: domain
+    scope: "*.full.example.com"
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - passive_recon
+      - light_active_scan
+      - active_scanning
+      - known_vuln_scanning
+      - bounded_fuzzing
+      - dns_enumeration
+      - osint_recon
+      - tls_analysis
+      - vuln_script_scanning
+
+  - target: "expired.example.com"
+    type: domain
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2020-01-01"
+
+  - target: "limited.example.com"
+    type: domain
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - passive_recon
+
+  - target: "203.0.113.50"
+    type: ip
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - passive_recon
+      - active_scanning
+      - light_active_scan
+
+  - target: "203.0.113.0/28"
+    type: cidr
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - network_discovery
+
+  - target: "ics.example.com"
+    type: domain
+    authorized_by: "test suite"
+    authorization_date: "2026-01-01"
+    evidence: "fixture"
+    expires_at: "2099-12-31"
+    allowed_categories:
+      - ics_scada_recon

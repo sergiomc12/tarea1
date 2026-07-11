@@ -1,0 +1,58 @@
+{
+  "crawl_metadata": {
+    "crawl_id": "busqueda-licitaciones",
+    "domain": "multi-site",
+    "crawler_version": "0.2.0",
+    "crawl_started_at": "2026-07-06T10:00:00Z",
+    "crawl_finished_at": "2026-07-06T11:00:00Z",
+    "total_pages_visited": 60,
+    "total_articles_extracted": 40,
+    "robots_txt_respected": true,
+    "errors": [],
+    "search_target": {
+      "label": "licitaciones",
+      "keywords": ["licitacion"],
+      "exclude_keywords": [],
+      "patterns": [],
+      "match_in": ["headline", "content_blocks"],
+      "min_score": 0.3,
+      "require_all": false
+    }
+  },
+  "articles": [],
+  "extraction_quality": {
+    "articles_fully_parsed": 0,
+    "articles_partial": 0,
+    "articles_failed": 0,
+    "confidence_score": 1.0,
+    "warnings": []
+  },
+  "search_results": [
+    {
+      "article_id": "gestion-fixture-001",
+      "score": 0.9,
+      "matched_fields": ["headline"],
+      "matched_terms": ["licitacion"],
+      "matched_snippets": [
+        {
+          "field": "headline",
+          "text": "[[licitacion]] en gestion.pe"
+        }
+      ],
+      "domain": "gestion.pe"
+    },
+    {
+      "article_id": "elcomercio-fixture-002",
+      "score": 0.75,
+      "matched_fields": ["content_blocks"],
+      "matched_terms": ["licitacion"],
+      "matched_snippets": [
+        {
+          "field": "content_blocks",
+          "text": "Proceso de [[licitacion]] regional"
+        }
+      ],
+      "domain": "elcomercio.pe"
+    }
+  ]
+}

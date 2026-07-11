@@ -1,0 +1,25 @@
+label: "Sentencias judiciales y jurisprudencia — Perú"
+keywords:
+  - sentencia
+  - fallo
+  - tribunal
+  - Corte Suprema
+  - Poder Judicial
+  - Sala Penal
+  - Sala Civil
+  - casación
+  - absolución
+  - condena
+exclude_keywords:
+  - deportes
+  - farándula
+patterns:
+  - '\bExp\.\s*N[°º]?\s*\d+-\d{4}\b'
+  - '\bR\.\s*N[°º]?\s*\d+-\d{4}-[A-Z]{2,4}\b'
+match_in:
+  - headline
+  - excerpt
+  - content_blocks
+  - outbound_links
+min_score: 0.4
+require_all: false

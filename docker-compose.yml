@@ -1,0 +1,98 @@
+# Build context: raíz del repo (docker compose build)
+
+services:
+  scraper_agent:
+    build:
+      context: .
+      dockerfile: docker/scraper_agent/Dockerfile
+    ports:
+      - "1212:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      KALI_CONTAINER: kali-tools
+      DEEPSEEK_API_URL: ${DEEPSEEK_API_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
+    depends_on:
+      kali:
+        condition: service_started
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - scraper_internal
+    restart: unless-stopped
+
+  defense_watcher:
+    # defense_env/ — vigilancia continua. Antes se llamaba `fim_watcher` y
+    # solo corría FIM (Fase 1); renombrado al agregar `defense-correlate`
+    # (Fase 2) al mismo loop -- ambas son comandos livianos de la misma
+    # imagen, correr dos contenedores separados solo para esto no se
+    # justificaba. Ver CHANGELOG.md "capa defensiva defense_env/".
+    build:
+      context: .
+      dockerfile: docker/scraper_agent/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DEFENSE_SCAN_INTERVAL_SECONDS: ${DEFENSE_SCAN_INTERVAL_SECONDS:-300}
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config:ro
+      # docker-compose.yml y docker/ NO están dentro de ./config -- sin estos
+      # dos mounts, config/defense/fim_watch.yaml los declara vigilados pero
+      # _iter_watched_files() los salteaba en silencio (ni error ni alerta)
+      # porque el path simplemente no existía dentro del contenedor. Bug
+      # real, visto en el primer log del watcher (baseline de 3 archivos en
+      # vez de 5). Ver CHANGELOG.md.
+      - ./docker-compose.yml:/app/docker-compose.yml:ro
+      - ./docker:/app/docker:ro
+      # .env se vigila por FIM (2026-07-09) pero `env_file:` de arriba solo
+      # INYECTA las variables ya resueltas al proceso -- no monta el
+      # archivo en el filesystem del contenedor. Sin este mount, `.env`
+      # sería otra "ruta vigilada no encontrada" (mismo bug que
+      # docker-compose.yml/docker/ arriba). No es una exposición nueva: sus
+      # valores ya están en el entorno de este contenedor por env_file, y
+      # FIM solo lee bytes para hashear (SHA-256, nunca contenido) -- ver
+      # config/defense/fim_watch.yaml y CHANGELOG.md.
+      - ./.env:/app/.env:ro
+    networks:
+      - scraper_internal
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        if [ ! -f output/security/fim_baseline.json ]; then
+          echo "[defense_watcher] sin baseline previo, generando uno nuevo"
+          scraper-agent fim-baseline
+        fi
+        while true; do
+          scraper-agent fim-scan || true
+          scraper-agent defense-correlate || true
+          sleep "$$DEFENSE_SCAN_INTERVAL_SECONDS"
+        done
+
+  kali:
+    build:
+      context: .
+      dockerfile: docker/kali/Dockerfile
+    container_name: kali-tools
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./config/ssh:/run/secrets/ssh:ro
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+    networks:
+      - scraper_internal
+    restart: unless-stopped
+    # Sin sección ports — no expuesto al host
+
+networks:
+  scraper_internal:
+    driver: bridge

@@ -1,0 +1,110 @@
+domain: "https://www.expreso.com.pe/"
+
+discovery:
+
+  mode: crawl
+
+  rss_feeds: []
+
+  max_items_per_feed: 25
+
+  expand_sitemaps: false
+
+  article_link_pattern: "-noticia"
+
+scope:
+
+  include_subdomains: false
+
+  max_depth: 3
+
+  max_pages: 25
+
+  exclude_patterns:
+
+    - "/logout"
+
+    - "/login"
+
+    - "/suscri"
+
+    - "/autor/"
+
+    - "/tag/"
+
+    - "/cdn-cgi/"
+
+    - "/wp-content/"
+
+    - "/wp-json/"
+
+    - "\\.(pdf|zip|jpg|jpeg|png|gif|webp|mp4|svg)$"
+
+concurrency:
+
+  max_workers: 1
+
+  requests_per_second_per_domain: 0.3
+
+retry:
+
+  max_attempts: 3
+
+  backoff_factor: 2
+
+render:
+
+  mode: "auto"
+
+auth:
+
+  enabled: false
+
+  login_url: ""
+
+  username_env: "SCRAPER_USERNAME"
+
+  password_env: "SCRAPER_PASSWORD"
+
+anti_detection:
+
+  rotate_user_agent: true
+
+  session_warmup: false
+
+  chrome_client_hints: true
+
+  use_playwright_on_403: true
+
+  prefer_playwright: true
+
+  random_delay_range: [2.0, 4.0]
+
+  proxies_env: "PROXY_LIST"
+
+output:
+
+  format: "json"
+
+  path: "output/expreso_com_pe.json"
+
+  checkpoint_dir: "output/checkpoints/expreso_com_pe"
+
+date_range:
+
+  from: "2026-07-01T05:00:00Z"
+
+  to: "2026-07-06T04:59:59Z"
+
+respect_robots_txt: true
+
+selectors:
+
+  article_root: ".entry-content, article, .post-content"
+
+  titulo: "h1"
+
+  titulos_seccion: "h2, h3"
+
+  parrafos: "article p, .story-contents p, p"
+

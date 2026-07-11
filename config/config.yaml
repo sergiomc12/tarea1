@@ -1,0 +1,32 @@
+domain: "https://example.com"
+scope:
+  include_subdomains: true
+  max_depth: 6
+  max_pages: 5000
+  exclude_patterns:
+    - "/logout"
+    - "/carrito"
+    - "\\.(pdf|zip|jpg|png|gif|mp4)$"
+concurrency:
+  max_workers: 8
+  requests_per_second_per_domain: 2
+retry:
+  max_attempts: 3
+  backoff_factor: 2
+render:
+  mode: "auto"
+auth:
+  enabled: false
+  login_url: ""
+  username_env: "SCRAPER_USERNAME"
+  password_env: "SCRAPER_PASSWORD"
+anti_detection:
+  rotate_user_agent: true
+  random_delay_range: [1.0, 3.0]
+  proxies_env: "PROXY_LIST"
+output:
+  format: "json"
+  path: "output/resultado.json"
+  checkpoint_dir: "output/checkpoints"
+  incremental: true
+respect_robots_txt: true

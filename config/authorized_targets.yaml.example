@@ -1,0 +1,39 @@
+# Copiar a authorized_targets.yaml y completar antes de habilitar testing de seguridad.
+# Solo dominios/IPs listados aquí pueden recibir herramientas de security_env (no scraping).
+
+authorized_targets:
+  - target: "ejemplo.com"
+    type: domain
+    scope: "*.ejemplo.com"
+    authorized_by: "nombre del responsable o ticket interno"
+    authorization_date: "2026-07-06"
+    evidence: "contrato / email / acta de pentest #123"
+    expires_at: "2027-07-06"
+    allowed_categories:
+      - passive_recon
+      - light_active_scan
+      # - dns_enumeration
+      # Descomentar solo con autorización explícita para pentest ampliado:
+      # - active_scanning
+      # - known_vuln_scanning
+      # - bounded_fuzzing
+      # - tls_analysis
+      # - vuln_script_scanning
+      # ics_scada_recon: NO descomentar salvo autorización explícita del
+      # responsable industrial del activo — ver docs/alcance-seguridad.md §2.10.6
+      # (escanear PLCs/SCADA reales puede afectar su estabilidad).
+      # - ics_scada_recon
+    notes: "Solo reconocimiento pasivo y escaneo de puertos en horario laboral"
+
+  # - target: "203.0.113.10"
+  #   type: ip
+  #   authorized_by: "equipo infra"
+  #   authorization_date: "2026-07-06"
+  #   evidence: "inventario de activos propios"
+  #   expires_at: null
+  #   allowed_categories:
+  #     - passive_recon
+  #     - light_active_scan
+  #     - active_scanning
+  #     - known_vuln_scanning
+  #     - bounded_fuzzing

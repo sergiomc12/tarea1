@@ -1,0 +1,480 @@
+# Catálogo cerrado — alineado a docs/alcance-seguridad.md §2
+# Solo herramientas listadas aquí pueden invocarse vía tool_runner.py
+
+tools:
+  - id: whois
+    category: passive_recon
+    binary: whois
+    description: Consulta WHOIS de un dominio autorizado
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["whois", "{host}"]
+
+  - id: dig_a
+    category: passive_recon
+    binary: dig
+    description: Resolución DNS registro A
+    timeout_seconds: 30
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["dig", "+short", "{host}", "A"]
+
+  - id: curl_headers
+    category: passive_recon
+    binary: curl
+    description: Headers HTTP (GET -I) sin cuerpo
+    timeout_seconds: 30
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["curl", "-sS", "-I", "https://{host}"]
+
+  - id: nslookup_a
+    category: passive_recon
+    binary: nslookup
+    description: Resolución DNS registro A vía nslookup
+    timeout_seconds: 30
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["nslookup", "-type=A", "{host}"]
+
+  - id: dnsenum_safe
+    category: dns_enumeration
+    binary: dnsenum
+    description: Enumeración DNS sin zone transfer ni reverse brute
+    timeout_seconds: 180
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["dnsenum", "--noreverse", "--timeout", "5", "--threads", "2", "{host}"]
+
+  - id: dnsrecon_std
+    category: dns_enumeration
+    binary: dnsrecon
+    description: Recon DNS estándar (registros comunes, sin AXFR)
+    timeout_seconds: 180
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["dnsrecon", "-d", "{host}", "-t", "std", "--lifetime", "15"]
+
+  - id: sublist3r_safe
+    category: dns_enumeration
+    binary: sublist3r
+    description: Enumeración de subdominios (3 hilos, sin salida color)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["sublist3r", "-d", "{host}", "-t", "3", "-n"]
+
+  - id: nmap_top100
+    category: light_active_scan
+    binary: nmap
+    description: Escaneo TCP top 100 puertos (sin scripts NSE)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["nmap", "-sT", "--top-ports", "100", "{host}"]
+
+  - id: nmap_services
+    category: active_scanning
+    binary: nmap
+    description: Detección de servicios en top 50 puertos (sin scripts NSE)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["nmap", "-sT", "-sV", "--top-ports", "50", "{host}"]
+
+  - id: nikto_safe
+    category: known_vuln_scanning
+    binary: nikto
+    description: Escaneo web no intrusivo (Tuning x, tiempo acotado)
+    timeout_seconds: 180
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "nikto",
+        "-h",
+        "https://{host}",
+        "-Tuning",
+        "x",
+        "-maxtime",
+        "120s",
+        "-nointeractive",
+      ]
+
+  - id: gobuster_dir
+    category: bounded_fuzzing
+    binary: gobuster
+    description: Fuerza bruta de directorios con wordlist common (seclists)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "gobuster",
+        "dir",
+        "-u",
+        "https://{host}/",
+        "-w",
+        "/usr/share/seclists/Discovery/Web-Content/common.txt",
+        "-t",
+        "5",
+        "-q",
+        "-b",
+        "403,404,429",
+        "--timeout",
+        "10s",
+        "--no-error",
+      ]
+
+  - id: masscan_top_ports
+    category: active_scanning
+    binary: masscan
+    description: Escaneo rápido de puertos comunes (rate 50 pps); requiere IP o dominio resoluble
+    timeout_seconds: 120
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "masscan",
+        "{host}",
+        "-p22,80,443,8080,3000,5432,8000,111",
+        "--rate",
+        "50",
+        "--wait",
+        "1",
+        "--open",
+      ]
+
+  - id: netdiscover_passive
+    category: network_discovery
+    binary: netdiscover
+    description: Descubrimiento de hosts en CIDR autorizado (ping sweep acotado)
+    timeout_seconds: 180
+    params:
+      - name: host
+        type: cidr
+        required: true
+    argv_template: ["netdiscover", "-r", "{host}", "-s", "2", "-c", "5"]
+
+  - id: nuclei_safe
+    category: known_vuln_scanning
+    binary: nuclei
+    description: Plantillas Nuclei no destructivas (info/low/medium); rate limit 15 rps
+    timeout_seconds: 900
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "nuclei",
+        "-u",
+        "https://{host}",
+        "-severity",
+        "info,low,medium",
+        "-tags",
+        "misconfig,exposure,tech",
+        "-max-host-error",
+        "10",
+        "-rate-limit",
+        "15",
+        "-timeout",
+        "10",
+        "-no-color",
+        "-silent",
+        "-disable-update-check",
+      ]
+
+  - id: amass_passive
+    category: osint_recon
+    binary: amass
+    description: Enumeración pasiva de subdominios (sin resolución activa agresiva)
+    timeout_seconds: 600
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "amass",
+        "enum",
+        "-passive",
+        "-d",
+        "{host}",
+        "-timeout",
+        "5",
+        "-silent",
+      ]
+
+  - id: theharvester_safe
+    category: osint_recon
+    binary: theHarvester
+    description: OSINT emails/subdominios vía fuentes públicas (sin APIs de pago)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "theHarvester",
+        "-d",
+        "{host}",
+        "-b",
+        "duckduckgo",
+        "-l",
+        "50",
+      ]
+
+  - id: spiderfoot_passive
+    category: osint_recon
+    binary: python3
+    description: Correlación OSINT modo passive (1 hilo, sin módulos intrusivos)
+    timeout_seconds: 900
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "python3",
+        "/usr/share/spiderfoot/sf.py",
+        "-s",
+        "{host}",
+        "-m",
+        "sfp_dnsresolve,sfp_whois,sfp_sslcert,sfp_hackertarget",
+        "-q",
+        "-max-threads",
+        "1",
+      ]
+
+  - id: dirb_small
+    category: bounded_fuzzing
+    binary: dirb
+    description: Fuerza bruta de directorios con wordlist dirb small (sin recursión)
+    timeout_seconds: 600
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "dirb",
+        "https://{host}/",
+        "/usr/share/dirb/wordlists/small.txt",
+        "-r",
+        "-S",
+        "-z",
+        "10",
+      ]
+
+  - id: ffuf_dir
+    category: bounded_fuzzing
+    binary: ffuf
+    description: Fuzzing de directorios con wordlist small (5 hilos, rate 10/s)
+    timeout_seconds: 600
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "ffuf",
+        "-u",
+        "https://{host}/FUZZ",
+        "-w",
+        "/usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-small.txt",
+        "-ac",
+        "-t",
+        "5",
+        "-rate",
+        "10",
+        "-mc",
+        "301,302,403",
+        "-timeout",
+        "10",
+        "-noninteractive",
+      ]
+
+  - id: wpscan_enum
+    category: bounded_fuzzing
+    binary: wpscan_enum_safe
+    description: Enumeración WordPress (plugins/temas vuln); sin brute de credenciales
+    timeout_seconds: 600
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["wpscan_enum_safe", "https://{host}"]
+
+  - id: whatweb_safe
+    category: passive_recon
+    binary: whatweb
+    description: Fingerprint de tecnologías web (agresividad mínima)
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["whatweb", "-a", "1", "--no-errors", "{host}"]
+
+  - id: httpx_probe
+    category: passive_recon
+    binary: httpx-toolkit
+    description: Sondeo HTTP con detección de tecnología (ProjectDiscovery httpx)
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["httpx-toolkit", "-u", "{host}", "-silent", "-tech-detect", "-no-color"]
+
+  - id: wafw00f_safe
+    category: passive_recon
+    binary: wafw00f
+    description: Detección de WAF frente al sitio (sin técnicas de bypass)
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["wafw00f", "https://{host}"]
+
+  - id: sslscan_safe
+    category: tls_analysis
+    binary: sslscan
+    description: Configuración TLS/SSL y cipher suites soportadas
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["sslscan", "--no-colour", "{host}"]
+
+  - id: sslyze_safe
+    category: tls_analysis
+    binary: sslyze
+    description: Análisis TLS en profundidad (certificado, protocolos, cipher suites)
+    timeout_seconds: 90
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["sslyze", "--json_out", "-", "{host}"]
+
+  - id: testssl_safe
+    category: tls_analysis
+    binary: testssl
+    description: Reporte TLS acotado (modo rápido, sin pruebas de todas las suites)
+    timeout_seconds: 180
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["testssl", "--fast", "--quiet", "--color", "0", "{host}"]
+
+  - id: openssl_cert
+    category: tls_analysis
+    binary: openssl_cert_check
+    description: Certificado TLS vía handshake openssl s_client (sin renegociación)
+    timeout_seconds: 30
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["openssl_cert_check", "{host}"]
+
+  - id: fierce_safe
+    category: dns_enumeration
+    binary: fierce
+    description: Descubrimiento de rangos DNS/red (límites por defecto del paquete)
+    timeout_seconds: 120
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template: ["fierce", "--domain", "{host}"]
+
+  - id: zmap_safe
+    category: active_scanning
+    binary: zmap
+    description: Escaneo de 1 puerto fijo contra 1 host (sin barrido de rango)
+    timeout_seconds: 60
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["zmap", "-p", "443", "-N", "1", "-o", "-", "{host}"]
+
+  - id: unicornscan_safe
+    category: active_scanning
+    binary: unicornscan
+    description: Escaneo TCP asíncrono acotado a top puertos comunes de 1 host
+    timeout_seconds: 120
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["unicornscan", "-mT", "-p", "22,80,443,8080,3000,5432,8000,111", "{host}"]
+
+  - id: nmap_vuln_scripts
+    category: vuln_script_scanning
+    binary: nmap
+    description: Subconjunto de scripts NSE no destructivos (sin categoría vuln completa)
+    timeout_seconds: 300
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      [
+        "nmap",
+        "-sV",
+        "--script",
+        "banner,ssl-cert,http-security-headers,ssh2-enum-algos,smb-os-discovery",
+        "--top-ports",
+        "50",
+        "{host}",
+      ]
+
+  - id: modbus_s7_discover
+    category: ics_scada_recon
+    binary: nmap
+    description: Identificación Modbus/S7 (solo lectura de banners, sin escritura de registros)
+    timeout_seconds: 120
+    params:
+      - name: host
+        type: hostname
+        required: true
+    argv_template:
+      ["nmap", "--script", "modbus-discover,s7-info", "-p", "502,102", "{host}"]

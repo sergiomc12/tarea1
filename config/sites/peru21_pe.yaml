@@ -1,0 +1,49 @@
+domain: "https://peru21.pe/"
+discovery:
+  mode: rss
+  rss_feeds:
+    - "https://peru21.pe/arc/outboundfeeds/rss/?outputType=xml"
+  max_items_per_feed: 25
+scope:
+  include_subdomains: false
+  max_depth: 2
+  max_pages: 30
+  exclude_patterns:
+    - "/logout"
+    - "/login"
+    - "/suscri"
+    - "/autor/"
+    - "\\.(pdf|zip|jpg|jpeg|png|gif|webp|mp4|svg)$"
+concurrency:
+  max_workers: 4
+  requests_per_second_per_domain: 1
+retry:
+  max_attempts: 3
+  backoff_factor: 2
+render:
+  mode: "auto"
+auth:
+  enabled: false
+  login_url: ""
+  username_env: "SCRAPER_USERNAME"
+  password_env: "SCRAPER_PASSWORD"
+anti_detection:
+  rotate_user_agent: true
+  session_warmup: true
+  chrome_client_hints: true
+  use_playwright_on_403: true
+  random_delay_range: [2.5, 5.0]
+  proxies_env: "PROXY_LIST"
+output:
+  format: "json"
+  path: "output/peru21_pe.json"
+  checkpoint_dir: "output/checkpoints/peru21_pe"
+date_range:
+  from: "2026-07-01T05:00:00Z"
+  to: "2026-07-06T04:59:59Z"
+respect_robots_txt: true
+selectors:
+  article_root: ".story-contents"
+  titulo: "h1"
+  titulos_seccion: "h2, h3"
+  parrafos: "article p, .story-contents p, p"

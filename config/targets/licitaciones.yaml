@@ -1,0 +1,22 @@
+label: "Licitaciones de construcción — Perú julio 2026"
+keywords:
+  - licitación
+  - concurso público
+  - buena pro
+  - OSCE
+exclude_keywords:
+  - deportes
+  - farándula
+patterns:
+  - '\bN°\s*\d{3,6}-\d{4}\b'
+  - '\bS/\.\s*[\d,]+\b'
+match_in:
+  - headline
+  - excerpt
+  - content_blocks
+  - outbound_links
+min_score: 0.4
+require_all: false
+date_range:
+  from: "2026-07-01"
+  to: "2026-07-06"

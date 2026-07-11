@@ -1,0 +1,15 @@
+#!/bin/sh
+# Wrapper WPScan: actualiza la BD una vez y ejecuta enumeración acotada.
+set -eu
+
+URL="${1:?url requerida}"
+
+wpscan --update
+
+exec wpscan \
+  --url "$URL" \
+  --enumerate vp,vt \
+  --max-threads 2 \
+  --request-timeout 10 \
+  --ignore-main-redirect \
+  --no-banner

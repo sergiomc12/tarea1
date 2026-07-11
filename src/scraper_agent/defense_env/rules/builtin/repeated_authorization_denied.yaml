@@ -1,0 +1,21 @@
+# Regla de correlación (ver defense_env/correlation.py).
+#
+# No se fuerza un mitre_technique acá a propósito: MITRE ATT&CK modela
+# técnicas de un atacante contra una víctima externa; esto detecta a alguien
+# (interno o comprometido) probando/sondeando el propio AuthorizationGuard
+# del proyecto -- no hay una técnica ATT&CK que describa eso limpiamente sin
+# forzar el encaje. Se prefiere dejarlo sin etiquetar antes que etiquetar mal.
+id: correlation.repeated_authorization_denied
+title: "Multiples rechazos de autorizacion del mismo solicitante"
+severity: high
+logsource: tool_audit
+filter:
+  allowed: false
+group_by: requested_by
+threshold_count: 3
+window_seconds: 300
+description: >
+  3 o mas intentos rechazados por AuthorizationGuard del mismo `requested_by`
+  en una ventana de 5 minutos -- patron de sondeo/prueba-error contra el
+  catalogo de herramientas o los targets autorizados en vez de un uso
+  legitimo puntual.

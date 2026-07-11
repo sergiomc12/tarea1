@@ -1,0 +1,25 @@
+label: "Commodities y materias primas — Perú"
+keywords:
+  - cobre
+  - zinc
+  - oro
+  - plata
+  - petróleo
+  - gas natural
+  - mineral
+  - commodity
+  - precio internacional
+  - exportación minera
+exclude_keywords:
+  - deportes
+  - farándula
+patterns:
+  - '\bUS\$\s*[\d,]+(?:\.\d+)?\b'
+  - '\bS/\.\s*[\d,]+(?:\.\d+)?\b'
+match_in:
+  - headline
+  - excerpt
+  - content_blocks
+  - taxonomy
+min_score: 0.35
+require_all: false

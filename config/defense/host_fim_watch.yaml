@@ -1,0 +1,42 @@
+# FIM sobre el SISTEMA OPERATIVO real (no el proyecto/contenedores -- ver
+# config/defense/fim_watch.yaml para eso). Pensado para RHEL/CentOS.
+#
+# IMPORTANTE -- cómo correr esto de verdad: estas son rutas ABSOLUTAS del
+# host. Reusa el mismo motor de fim.py (compute_baseline/scan_for_drift),
+# así que `scraper-agent fim-baseline --config config/defense/
+# host_fim_watch.yaml --output output/security/host_fim_baseline.json`
+# funciona igual que con el FIM de proyecto -- pero solo si el proceso que
+# lo corre puede VER esas rutas de verdad:
+#   - Corriendo tarea1 instalado nativamente en la VM (venv, sin Docker):
+#     funciona directo, sin nada que montar.
+#   - Corriendo dentro de un contenedor: necesita bind-mount explícito de
+#     cada ruta (ej. "./:/host/etc:ro" apuntando al /etc REAL del host, no
+#     al /etc del propio contenedor -- que es un /etc distinto y no dice
+#     nada del sistema operativo real). Ver CHANGELOG.md.
+#
+# Ver también defense_env/host_defense.py (detect_os/detect_firewall_tool)
+# para las acciones de respuesta.
+
+paths:
+  - /etc/passwd
+  - /etc/shadow
+  - /etc/ssh/sshd_config
+  - /etc/sudoers
+  - /etc/crontab
+  - /etc/cron.d
+  - /etc/cron.daily
+  - /etc/cron.hourly
+  - /root/.ssh/authorized_keys
+
+# Cualquier cambio acá es candidato a persistencia de atacante (usuario
+# nuevo, llave SSH agregada, sudo ampliado, cron malicioso) -- todo se
+# marca critical, no solo un subconjunto como en el FIM de proyecto.
+critical_files:
+  - passwd
+  - shadow
+  - sshd_config
+  - sudoers
+  - crontab
+  - authorized_keys
+
+exclude_patterns: []

@@ -1,0 +1,25 @@
+.env
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+output/*
+!output/.gitkeep
+config/ssh/*
+!config/ssh/.gitkeep
+!config/ssh/README.md
+
+# Extensión nativa opcional de C++ (defense_env/_fim_native) -- artefacto
+# de build, se recompila en cada imagen Docker (ver Dockerfile). El código
+# fuente (.cpp) sí se versiona.
+build/
+src/scraper_agent/defense_env/_fim_native/*.so
+src/scraper_agent/defense_env/_fim_native.cpython-*.so
+
+# Artefacto local generado por el escaneo FIM nativo (mirror accidental de ruta Windows con codificacion Cygwin)
+C/

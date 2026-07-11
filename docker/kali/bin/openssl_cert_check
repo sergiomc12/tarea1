@@ -1,0 +1,8 @@
+#!/bin/sh
+# Wrapper openssl s_client: solo handshake + certificado, sin renegociación,
+# cierra stdin y aplica timeout para no dejar la conexión colgada.
+set -eu
+
+HOST="${1:?host requerido}"
+
+exec timeout 15 sh -c "echo | openssl s_client -connect '${HOST}:443' -servername '${HOST}' 2>/dev/null | openssl x509 -noout -text"

@@ -1,0 +1,31 @@
+# Unidad systemd de REFERENCIA para el agente continuo de defensa a nivel
+# de sistema operativo -- ver CHANGELOG.md "defensa activa a nivel de
+# sistema operativo" y scripts/host_agent_loop.sh.
+#
+# NO se instala automáticamente -- copiar a mano en el servidor real:
+#   sudo cp scripts/tarea1-host-agent.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tarea1-host-agent
+#
+# Requiere root (para leer /var/log/secure, tocar firewalld, matar
+# procesos) -- ajustar WorkingDirectory/ExecStart/venv al path real de la
+# instalación en el servidor.
+
+[Unit]
+Description=tarea1 — agente continuo de defensa a nivel de sistema operativo
+After=network.target
+
+[Service]
+# ExecStart corre UN ciclo y termina (defense-host-agent-cycle no hace su
+# propio loop) -- Restart=always + RestartSec hace que systemd lo repita
+# indefinidamente, sin necesitar scripts/host_agent_loop.sh acá (ese script
+# es la alternativa para un servidor SIN systemd).
+Type=simple
+WorkingDirectory=/opt/tarea1
+ExecStart=/opt/tarea1/.venv/bin/scraper-agent defense-host-agent-cycle
+Restart=always
+RestartSec=60
+User=root
+
+[Install]
+WantedBy=multi-user.target

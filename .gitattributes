@@ -1,0 +1,7 @@
+# docker/kali/bin/* son scripts que se copian y ejecutan dentro del
+# contenedor Linux Kali. Si el checkout ocurre en Windows con
+# core.autocrlf=true, git los convierte a CRLF y el shebang (#!/bin/sh\r)
+# deja de resolver, rompiendo el wrapper dentro del contenedor con un error
+# "no such file or directory" engañoso (el archivo existe, pero el
+# intérprete "/bin/sh\r" no). Forzar LF sin importar el autocrlf del cliente.
+docker/kali/bin/* text eol=lf

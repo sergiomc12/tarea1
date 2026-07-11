@@ -1,0 +1,46 @@
+# Config de File Integrity Monitoring (defense_env/, ver CHANGELOG.md
+# "Añadido — capa defensiva defense_env/, fase 1 — FIM").
+#
+# Vigila los archivos cuya alteración silenciosa ampliaría el alcance
+# ofensivo autorizado, abriría una puerta trasera en el contenedor Kali,
+# cambiaría credenciales/config crítica (.env), o insertaría código
+# malicioso en la propia fuente (backdoor).
+#
+# .env SÍ se vigila (hash-only, agregado 2026-07-09): FIM nunca lee ni
+# almacena contenido, solo un SHA-256 -- eso ya era cierto para TODOS los
+# archivos vigilados desde el día 1, no es un modo especial nuevo. Un hash
+# no es reversible al secreto original. Ver CHANGELOG.md para el mount
+# necesario en docker-compose.yml (env_file NO monta el archivo en el
+# contenedor, solo inyecta las variables ya resueltas).
+#
+# src/scraper_agent (recursivo, agregado 2026-07-09 -- detección de
+# backdoors): cualquier .py/.yaml agregado o modificado fuera de un
+# despliegue legítimo es señal de código insertado. NO es "critical" (el
+# código cambia legítimamente todo el tiempo en desarrollo activo -- sería
+# puro ruido) sino la severidad normal por tipo de drift (medium si es
+# archivo nuevo, high si un archivo existente cambió). Reemplaza las 2
+# entradas puntuales de tool_catalog.yaml/categories.py (ya cubiertas por
+# el path recursivo).
+
+paths:
+  - config/authorized_targets.yaml
+  - src/scraper_agent
+  - docker-compose.yml
+  - docker/kali/Dockerfile
+  - .env
+
+# Basename de archivos que disparan severidad "critical" si cambian (en vez
+# de "high"): son los archivos que definen el alcance ofensivo permitido o
+# las credenciales/config que controlan a qué servicios externos llama el
+# sistema (.env: DEEPSEEK_API_KEY, PROXY_LIST, SSH_REMOTE_*). Deliberadamente
+# NO incluye archivos de código fuente (ver nota de arriba).
+critical_files:
+  - authorized_targets.yaml
+  - tool_catalog.yaml
+  - .env
+
+# *.pyc / __pycache__: bytecode regenerado en cada corrida, no es código
+# fuente real -- vigilarlo sería puro ruido (cambia en cada `pytest`/import).
+exclude_patterns:
+  - "*.pyc"
+  - "*.pyo"

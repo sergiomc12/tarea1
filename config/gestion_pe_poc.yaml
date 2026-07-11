@@ -1,0 +1,41 @@
+domain: "https://gestion.pe/"
+discovery:
+  mode: both
+  rss_feeds:
+    - "https://gestion.pe/arc/outboundfeeds/rss/?outputType=xml"
+  max_items_per_feed: 8
+scope:
+  include_subdomains: false
+  max_depth: 5
+  max_pages: 12
+  exclude_patterns:
+    - "/logout"
+    - "/login"
+    - "/suscri"
+    - "/autor/"
+    - "\\.(pdf|zip|jpg|jpeg|png|gif|webp|mp4|svg)$"
+concurrency:
+  max_workers: 4
+  requests_per_second_per_domain: 1.5
+retry:
+  max_attempts: 3
+  backoff_factor: 2
+render:
+  mode: "auto"
+auth:
+  enabled: false
+anti_detection:
+  rotate_user_agent: true
+  random_delay_range: [0.5, 1.5]
+  proxies_env: "PROXY_LIST"
+output:
+  format: "json"
+  path: "output/gestion_pe_poc.json"
+  checkpoint_dir: "output/checkpoints/gestion_pe_poc"
+date_range: null
+respect_robots_txt: true
+selectors:
+  article_root: ".story-contents"
+  titulo: "h1"
+  titulos_seccion: "h2, h3"
+  parrafos: "article p, .story-contents p, p"

@@ -1,0 +1,32 @@
+# Medios peruanos soportados (configs en este directorio)
+sites:
+  - name: gestion.pe
+    config: config/gestion_pe.yaml
+    domain: https://gestion.pe/
+  - name: elcomercio.pe
+    config: config/sites/elcomercio_pe.yaml
+    domain: https://elcomercio.pe/
+  - name: larepublica.pe
+    config: config/sites/larepublica_pe.yaml
+    domain: https://larepublica.pe/
+  - name: ojo.pe
+    config: config/sites/ojo_pe.yaml
+    domain: https://ojo.pe/
+  - name: trome.com
+    config: config/sites/trome_com.yaml
+    domain: https://trome.com/
+  - name: elchino.pe
+    config: config/sites/elchino_pe.yaml
+    domain: https://elchino.pe/
+  - name: peru21.pe
+    config: config/sites/peru21_pe.yaml
+    domain: https://peru21.pe/
+  - name: expreso.com.pe
+    config: config/sites/expreso_com_pe.yaml
+    domain: https://www.expreso.com.pe/
+  - name: libero.pe
+    config: config/sites/libero_pe.yaml
+    domain: https://libero.pe/
+  - name: elperuano.pe
+    config: config/sites/elperuano_pe.yaml
+    domain: https://elperuano.pe/

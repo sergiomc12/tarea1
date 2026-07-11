@@ -1,0 +1,25 @@
+label: "Decretos supremos y normas — Perú"
+keywords:
+  - decreto supremo
+  - DS N
+  - norma legal
+  - El Peruano
+  - publicación oficial
+  - reglamento
+  - ministerio
+  - vigencia
+exclude_keywords:
+  - deportes
+  - farándula
+patterns:
+  - '\bDS\s*N[°º]?\s*\d{3,4}-\d{4}-[A-Z]{2,4}\b'
+  - '\bD\.\s*S\.\s*N[°º]?\s*\d{3,4}-\d{4}\b'
+  - '\bD\.L\.\s*N[°º]?\s*\d+'
+match_in:
+  - headline
+  - excerpt
+  - content_blocks
+  - outbound_links
+  - taxonomy
+min_score: 0.4
+require_all: false

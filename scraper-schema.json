@@ -1,0 +1,1156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ejemplo.com/schemas/news-scraper-schema.json",
+  "title": "News Scraper Output Schema",
+  "description": "Esquema de validación para la salida estructurada de un scraper profesional de artículos periodísticos.",
+  "type": "object",
+  "required": [
+    "crawl_metadata",
+    "articles",
+    "extraction_quality"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "crawl_metadata": {
+      "type": "object",
+      "description": "Metadatos globales de la sesión de crawling.",
+      "required": [
+        "crawl_id",
+        "domain",
+        "crawler_version",
+        "crawl_started_at",
+        "crawl_finished_at",
+        "total_pages_visited",
+        "total_articles_extracted",
+        "robots_txt_respected"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "crawl_id": {
+          "type": "string",
+          "description": "Identificador único de la corrida de crawl.",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "examples": [
+            "gestion-20260704-235401"
+          ]
+        },
+        "domain": {
+          "type": "string",
+          "format": "hostname",
+          "examples": [
+            "gestion.pe"
+          ]
+        },
+        "crawler_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "examples": [
+            "2.4.1"
+          ]
+        },
+        "crawl_started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "crawl_finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "total_pages_visited": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_articles_extracted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "robots_txt_respected": {
+          "type": "boolean"
+        },
+        "date_range_filter": {
+          "type": "object",
+          "description": "Rango de fechas usado para filtrar artículos en esta corrida.",
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "to": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          }
+        },
+        "user_agent": {
+          "type": "string"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "url",
+              "error_type",
+              "message"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "error_type": {
+                "type": "string",
+                "enum": [
+                  "timeout",
+                  "http_error",
+                  "parse_error",
+                  "blocked_by_robots",
+                  "captcha",
+                  "unknown"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "status_code": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "occurred_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "search_target": {
+          "$ref": "#/$defs/search_target",
+          "description": "Objetivo de búsqueda usado en corridas targeted-search."
+        }
+      }
+    },
+    "articles": {
+      "type": "array",
+      "description": "Lista de artículos extraídos, cada uno como entidad completa y autocontenida.",
+      "items": {
+        "$ref": "#/$defs/article"
+      }
+    },
+    "extraction_quality": {
+      "type": "object",
+      "required": [
+        "articles_fully_parsed",
+        "articles_partial",
+        "articles_failed",
+        "confidence_score"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "articles_fully_parsed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "articles_partial": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "articles_failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "search_results": {
+      "type": "array",
+      "description": "Resultados de búsqueda por objetivo, ordenados por score descendente.",
+      "items": {
+        "$ref": "#/$defs/search_result"
+      }
+    }
+  },
+  "$defs": {
+    "search_target": {
+      "type": "object",
+      "description": "Objetivo de búsqueda profesional declarado por el usuario.",
+      "required": [
+        "label",
+        "keywords",
+        "exclude_keywords",
+        "patterns",
+        "match_in",
+        "min_score",
+        "require_all"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude_keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "match_in": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "headline",
+              "excerpt",
+              "content_blocks",
+              "outbound_links",
+              "authors",
+              "taxonomy"
+            ]
+          }
+        },
+        "min_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "require_all": {
+          "type": "boolean"
+        },
+        "date_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "from": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "to": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "search_result": {
+      "type": "object",
+      "description": "Coincidencia de un artículo con el objetivo de búsqueda.",
+      "required": [
+        "article_id",
+        "score",
+        "matched_fields",
+        "matched_terms",
+        "matched_snippets"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "article_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "matched_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "matched_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "matched_snippets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "field",
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string",
+                "description": "Fragmento con términos marcados como [[coincidencia]]."
+              }
+            }
+          }
+        },
+        "domain": {
+          "type": "string",
+          "description": "Dominio de origen en resultados consolidados multi-sitio."
+        }
+      }
+    },
+    "article": {
+      "type": "object",
+      "required": [
+        "article_id",
+        "url",
+        "fetch_info",
+        "identification",
+        "headline",
+        "dates",
+        "content_blocks",
+        "access"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "article_id": {
+          "type": "string",
+          "description": "Hash determinístico (dominio + slug + fecha) para deduplicar entre corridas de crawl.",
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "canonical_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "amp_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "fetch_info": {
+          "type": "object",
+          "required": [
+            "status_code",
+            "fetched_at"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "status_code": {
+              "type": "integer"
+            },
+            "fetched_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "response_time_ms": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "final_url_after_redirects": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uri"
+            },
+            "html_hash": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^sha256:[a-f0-9]{6,64}\\.?\\.?\\.?$|^sha256:[a-f0-9]{64}$"
+            },
+            "content_length_bytes": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "identification": {
+          "type": "object",
+          "required": [
+            "site_name",
+            "section"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "site_name": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "subsection": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "breadcrumbs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "is_premium": {
+              "type": "boolean",
+              "default": false
+            },
+            "premium_label": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "headline": {
+          "type": "object",
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "subtitle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "kicker": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta_title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "og_title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "excerpt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "meta_description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "og_description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "authorship": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "authors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "author_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "role": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "byline_raw": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            },
+            "editor": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "agency_source": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "dates": {
+          "type": "object",
+          "required": [
+            "published_at"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "published_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "updated_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "published_at_raw": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timezone": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "taxonomy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "primary_category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "secondary_categories": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "related_topics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "content_blocks": {
+          "type": "array",
+          "description": "Cuerpo del artículo en orden de lectura real. Cada bloque tiene 'order' para reconstrucción exacta.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/content_block"
+          }
+        },
+        "media": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cover_image": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/image"
+                }
+              ]
+            },
+            "inline_images": {
+              "type": "array",
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/image"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "position_after_block_order": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "videos": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "youtube",
+                      "vimeo",
+                      "native",
+                      "other"
+                    ]
+                  },
+                  "caption": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "duration_seconds": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "position_after_block_order": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "embeds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "url"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "twitter",
+                      "instagram",
+                      "tiktok",
+                      "iframe",
+                      "other"
+                    ]
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "position_after_block_order": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "outbound_links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "url",
+                  "anchor_text"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "anchor_text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "related_article",
+                      "external_source",
+                      "internal_reference",
+                      "citation",
+                      "other"
+                    ]
+                  },
+                  "position_after_block_order": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "internal_links_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "external_links_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "engagement": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "comments_count": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "shares_count": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "reading_time_minutes": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "access": {
+          "type": "object",
+          "required": [
+            "is_paywalled"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "is_paywalled": {
+              "type": "boolean"
+            },
+            "paywall_type": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "subscriber_only",
+                "metered",
+                "registration_required",
+                null
+              ]
+            },
+            "requires_login": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "seo_and_metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "canonical": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uri"
+            },
+            "robots_meta": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "schema_org_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "language": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+            },
+            "keywords_meta": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "raw_html_snapshot_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Referencia a almacenamiento externo (S3, GCS, etc.) del HTML crudo, para re-parseo posterior."
+        }
+      }
+    },
+    "content_block": {
+      "type": "object",
+      "required": [
+        "type",
+        "order"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "paragraph",
+            "heading",
+            "quote",
+            "related_link",
+            "list_item",
+            "image_caption",
+            "table"
+          ]
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Posición secuencial dentro del artículo, en orden real de lectura."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "paragraph"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "runs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/text_run"
+                },
+                "description": "OPCIONAL. Texto enriquecido del bloque, tramo por tramo, para preservar enlaces incrustados dentro de la prosa (no confundir con 'related_link', que es un bloque separado tipo 'LEA TAMBIÉN'). Si está presente, la concatenación de runs[].text DEBE ser idéntica a 'text'. Si el extractor no soporta aún runs, se omite este campo y 'text' sigue siendo obligatorio y suficiente para el consumo básico del contenido."
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "heading"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text",
+              "level"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "quote"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "attribution": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "related_link"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text",
+              "url"
+            ],
+            "properties": {
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "text": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "list_item"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "list_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "runs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/text_run"
+                },
+                "description": "OPCIONAL. Texto enriquecido del bloque, tramo por tramo, para preservar enlaces incrustados dentro de la prosa (no confundir con 'related_link', que es un bloque separado tipo 'LEA TAMBIÉN'). Si está presente, la concatenación de runs[].text DEBE ser idéntica a 'text'. Si el extractor no soporta aún runs, se omite este campo y 'text' sigue siendo obligatorio y suficiente para el consumo básico del contenido."
+              }
+            }
+          }
+        }
+      ]
+    },
+    "image": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "alt_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "caption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "credit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "width": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "height": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "text_run": {
+      "type": "object",
+      "description": "Un tramo de texto dentro de un bloque (paragraph o list_item). Permite representar enlaces incrustados a mitad de una oración (ej. '...concentran la mayor parte de los envíos del sector.' enlazado a otro artículo), en vez de perderlos al aplanar el bloque a texto plano.",
+      "required": [
+        "kind",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "text",
+            "link"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Texto visible de este tramo."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Solo si kind == 'link'."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "link"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "kind",
+              "text",
+              "url"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

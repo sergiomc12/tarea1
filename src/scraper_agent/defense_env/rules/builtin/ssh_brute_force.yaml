@@ -1,0 +1,19 @@
+# Regla de correlacion sobre el logsource "ssh_auth" (defense_env/
+# auth_log_parser.py). MITRE T1110 (Brute Force) -- mapeo directo y
+# correcto, a diferencia de "repeated_authorization_denied.yaml" (esa
+# deliberadamente no tiene mitre_technique porque no encaja limpio); acá
+# fuerza bruta SSH es exactamente lo que T1110 describe.
+id: correlation.ssh_brute_force
+title: "Fuerza bruta SSH detectada"
+severity: critical
+logsource: ssh_auth
+filter:
+  allowed: false
+group_by: source_ip
+threshold_count: 5
+window_seconds: 120
+mitre_technique: T1110
+description: >
+  5 o mas intentos fallidos de login SSH desde la misma IP en una ventana
+  de 2 minutos -- patron de fuerza bruta, no un typo ocasional de un
+  usuario legitimo.

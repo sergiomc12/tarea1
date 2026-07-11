@@ -1,0 +1,69 @@
+{
+  "crawl_metadata": {
+    "crawl_id": "fixture-crawl-minimal",
+    "domain": "gestion.pe",
+    "crawler_version": "0.2.0",
+    "crawl_started_at": "2026-07-06T10:00:00Z",
+    "crawl_finished_at": "2026-07-06T10:05:00Z",
+    "total_pages_visited": 1,
+    "total_articles_extracted": 1,
+    "robots_txt_respected": true,
+    "errors": []
+  },
+  "articles": [
+    {
+      "article_id": "gestion-fixture-001",
+      "url": "https://gestion.pe/economia/nota-fixture/",
+      "canonical_url": "https://gestion.pe/economia/nota-fixture/",
+      "amp_url": null,
+      "fetch_info": {
+        "status_code": 200,
+        "fetched_at": "2026-07-06T10:01:00Z",
+        "response_time_ms": null,
+        "final_url_after_redirects": "https://gestion.pe/economia/nota-fixture/",
+        "html_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "content_length_bytes": 1200
+      },
+      "identification": {
+        "site_name": "gestion.pe",
+        "section": "Economia",
+        "subsection": null,
+        "breadcrumbs": [],
+        "is_premium": false,
+        "premium_label": null
+      },
+      "headline": {
+        "title": "Fixture de licitacion publica en obra vial",
+        "subtitle": null,
+        "kicker": null,
+        "meta_title": null,
+        "og_title": null
+      },
+      "dates": {
+        "published_at": "2026-07-04T18:00:00Z",
+        "updated_at": null,
+        "published_at_raw": null,
+        "timezone": "America/Lima"
+      },
+      "content_blocks": [
+        {
+          "type": "paragraph",
+          "order": 0,
+          "text": "El proceso de licitacion y buena pro se publico en julio."
+        }
+      ],
+      "access": {
+        "is_paywalled": false,
+        "paywall_type": null,
+        "requires_login": false
+      }
+    }
+  ],
+  "extraction_quality": {
+    "articles_fully_parsed": 1,
+    "articles_partial": 0,
+    "articles_failed": 0,
+    "confidence_score": 1.0,
+    "warnings": []
+  }
+}
